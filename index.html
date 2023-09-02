@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang='en'>
+
+<head>
+    <meta charset='utf-8' />
+    <title>Points on a map</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1' />
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.js'></script>
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.css' rel='stylesheet' />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/css/lightbox.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/js/lightbox.min.js"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,700&display=swap">
+
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        #map {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 100%;
+        }
+
+
+        /* Custom Lightbox Styles */
+        .lightbox-container {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #545454cc;
+            z-index: 999;
+
+            justify-content: center;
+            align-items: center;
+        }
+
+        .lightbox-content {
+            max-width: 100%;
+            max-height: 100%;
+            margin: 20px;
+            background-color: rgba(6, 6, 6, 0.393);
+
+            border-radius: 5px;
+            text-align: left;
+
+        }
+
+
+
+        /* Stile für den Titel in der Lightbox */
+        .lightbox-title {
+            font-family: 'Roboto', sans-serif;
+            font-weight: bold;
+            /* Fett gedruckter Text für den Titel */
+            color: #ffffff;
+            padding-left: 20px;
+            /* Schriftfarbe für den Titel (weiß) */
+        }
+
+        /* Stile für die Beschreibung in der Lightbox */
+        .lightbox-description {
+            font-family: 'Roboto', sans-serif;
+            font-size: 14px;
+            padding-left: 20px;
+            padding-top: 0px;
+            /* Schriftgröße für die Beschreibung */
+            font-weight: normal;
+            /* Normale Schriftstärke für die Beschreibung */
+            color: #ffffff;
+            /* Schriftfarbe für die Beschreibung (weiß) */
+        }
+
+        .lightbox-image {
+            max-width: 100%;
+            max-height: 80%;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id='map'></div>
+    <div class="lightbox-container" id="lightbox-container">
+        <div class="lightbox-content" id="lightbox-content">
+            <img src="" alt="Lightbox Image" class="lightbox-image" id="lightbox-image">
+            <h3 class="lightbox-title" id="lightbox-title"></h3>
+            <p class="lightbox-description" id="lightbox-description"></p>
+        </div>
+    </div>
+    <script>
+        mapboxgl.accessToken = 'pk.eyJ1Ijoia2luZ3NsZXl5bSIsImEiOiJjbGt4dDUzdDkwN2RuM3BvYjBjNHYwZXY3In0.R7J3rSPygaPkLVhxQq2djQ';
+        const map = new mapboxgl.Map({
+            container: 'map',
+            style: 'mapbox://styles/kingsleyym/cllz354by00n201pbhfl3cr66',
+            center: [11.575, 48.135],
+            zoom: 10.7
+        });
+
+        // Create a variable to track the visibility state of the route and route2
+        let routeVisible = false;
+
+        map.on('load', () => {
+            // Set route2 layer to invisible initially
+            map.setLayoutProperty('route2', 'visibility', 'none');
+            map.setLayoutProperty('secondtext', 'visibility', 'none');
+            map.setLayoutProperty('thirdtext', 'visibility', 'none');
+        });
+
+        // Toggle route visibility when the map is clicked
+        map.on('click', (event) => {
+            const routeFeatures = map.queryRenderedFeatures(event.point, {
+                layers: ['route'] // Replace 'Route' with the name of your route layer
+            });
+
+            if (routeFeatures.length) {
+                // Adjust the opacity of the 'Route' layer only when the route is clicked
+                map.setPaintProperty('route', 'line-opacity', 1);
+
+                // Show route2 layer when route is clicked  
+                map.setLayoutProperty('route2', 'visibility', 'visible');
+            } else {
+                // If the click is not on the route, revert opacity to its previous value
+                map.setPaintProperty('route', 'line-opacity', 0.5);
+
+                // Hide route2 layer if the route is not clicked
+                map.setLayoutProperty('route2', 'visibility', 'none');
+            }
+        });
+
+        map.on('click', (event) => {
+            const routeFeatures = map.queryRenderedFeatures(event.point, {
+                layers: ['second'] // Replace 'Route' with the name of your route layer
+            });
+
+            if (routeFeatures.length) {
+                // Adjust the opacity of the 'Route' layer only when the route is clicked
+                map.setPaintProperty('second', 'line-opacity', 1);
+
+                // Show route2 layer when route is clicked  
+                map.setLayoutProperty('secondtext', 'visibility', 'visible');
+            } else {
+                // If the click is not on the route, revert opacity to its previous value
+                map.setPaintProperty('second', 'line-opacity', 0.5);
+
+                // Hide route2 layer if the route is not clicked
+                map.setLayoutProperty('secondtext', 'visibility', 'none');
+            }
+        });
+
+        map.on('click', (event) => {
+            const routeFeatures = map.queryRenderedFeatures(event.point, {
+                layers: ['third'] // Replace 'Route' with the name of your route layer
+            });
+
+            if (routeFeatures.length) {
+                // Adjust the opacity of the 'Route' layer only when the route is clicked
+                map.setPaintProperty('third', 'line-opacity', 1);
+
+                // Show route2 layer when route is clicked  
+                map.setLayoutProperty('thirdtext', 'visibility', 'visible');
+            } else {
+                // If the click is not on the route, revert opacity to its previous value
+                map.setPaintProperty('third', 'line-opacity', 0.5);
+
+                // Hide route2 layer if the route is not clicked
+                map.setLayoutProperty('thirdtext', 'visibility', 'none');
+            }
+        });
+
+        // Code to show popups when clicking on 'route2', 'secondtext', or 'thirdtext' markers
+        function showPopup(feature) {
+            const imageUrl = feature.properties.image;
+            const title = feature.properties.title;
+            const description = feature.properties.description;
+
+            const lightboxContainer = document.getElementById('lightbox-container');
+            const lightboxImage = document.getElementById('lightbox-image');
+            const lightboxTitle = document.getElementById('lightbox-title');
+            const lightboxDescription = document.getElementById('lightbox-description');
+
+            lightboxContainer.style.display = 'flex';
+            lightboxImage.src = imageUrl;
+            lightboxTitle.textContent = title;
+            lightboxDescription.textContent = description;
+
+            lightboxContainer.addEventListener('click', () => {
+                lightboxContainer.style.display = 'none';
+                lightboxImage.src = '';
+                lightboxTitle.textContent = '';
+                lightboxDescription.textContent = '';
+            });
+        }
+
+        map.on('click', 'route2', (event) => {
+            showPopup(event.features[0]);
+        });
+
+        map.on('click', 'secondtext', (event) => {
+            showPopup(event.features[0]);
+        });
+
+        map.on('click', 'thirdtext', (event) => {
+            showPopup(event.features[0]);
+        });
+    </script>
+</body>
+
+</html>
