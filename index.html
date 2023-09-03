@@ -126,14 +126,15 @@
             });
 
             if (routeFeatures.length) {
-                // Adjust the opacity of the 'Route' layer only when the route is clicked
-                map.setPaintProperty('route', 'line-opacity', 1);
-                map.setPaintProperty('third', 'line-opacity', 0.2);
-                map.setPaintProperty('second', 'line-opacity', 0.2);
-
-
                 // Show route2 layer when route is clicked  
                 map.setLayoutProperty('route2', 'visibility', 'visible');
+
+                const coordinates = routeFeatures[0].geometry.coordinates;
+                const startPoint = coordinates[0];
+                const endPoint = coordinates[coordinates.length - 1];
+
+                // Animate the route line color
+                animateRouteColor(startPoint, endPoint);
             } else {
                 // If the click is not on the route, revert opacity to its previous value
                 map.setPaintProperty('route', 'line-opacity', 0.5);
@@ -142,6 +143,40 @@
                 map.setLayoutProperty('route2', 'visibility', 'none');
             }
         });
+
+        function animateRouteColor(startPoint, endPoint) {
+            const animationDuration = 5000; // 5 seconds
+            const steps = 100; // Number of animation steps
+            const colorStep = 1 / steps; // Incremental color change step
+
+            let currentStep = 0;
+
+            function updateRouteColor() {
+                if (currentStep <= steps) {
+                    const interpolatedColor = interpolateColor(currentStep * colorStep);
+                    map.setPaintProperty('route', 'line-color', interpolatedColor);
+                    currentStep++;
+
+                    requestAnimationFrame(updateRouteColor);
+                }
+            }
+
+            function interpolateColor(progress) {
+                const startColor = [0, 0, 255]; // Blue (RGB values)
+                const endColor = [255, 0, 0]; // Red (RGB values)
+
+                const interpolatedColor = startColor.map((startChannel, index) => {
+                    const endChannel = endColor[index];
+                    return Math.round(startChannel + (endChannel - startChannel) * progress);
+                });
+
+                return `rgb(${interpolatedColor.join(',')})`;
+            }
+
+            updateRouteColor();
+        }
+
+
 
         map.on('click', (event) => {
             const routeFeatures = map.queryRenderedFeatures(event.point, {
@@ -159,6 +194,7 @@
             } else {
                 // If the click is not on the route, revert opacity to its previous value
                 map.setPaintProperty('second', 'line-opacity', 0.5);
+
 
                 // Hide route2 layer if the route is not clicked
                 map.setLayoutProperty('secondtext', 'visibility', 'none');
